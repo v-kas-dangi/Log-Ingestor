@@ -48,6 +48,46 @@ def get_es_data(index_name, query={}):
         # print(f"Document ID: {hit['_id']}, Data: {hit['_source']}")
     return data
 
+def search_es_data(index_name, query={}):
+    must_clauses = [
+        {"term": {key + ".keyword": value}} for key, value in query.items() if ("date" not in key and value != "" and key != "metadata")
+    ]
+    if query["metadata"] != "":
+        metadata_search = {"term": {"metadata.parentResourceId.keyword": query["metadata"]}}
+        must_clauses.append(metadata_search)
+    print("must clause: ")
+    print(must_clauses)
+    q_body={}
+    if(query["start_date"]!=""):
+        q_body = {
+            "query": {
+                "bool": {
+                    "must": must_clauses,
+                    "filter": {
+                        "range": {
+                            "timestamp": {"gte": query["start_date"], "lte": query["end_date"]}
+                        }
+                    }
+                }
+            }
+        }
+    else:
+        q_body = {
+            "query": {
+                "bool": {
+                    "must": must_clauses,
+                }
+            }
+        }
+    es=es_connection()
+    res = es.search(index=index_name, body=q_body)
+    hits = res["hits"]["hits"]
+    data=[]
+    for hit in hits:
+        data.append(hit['_source'])
+    return data
+
+# print(search_es_data("logs", query={'level': '', 'message': '', 'resourceId': '', 'start_date': '', 'end_date': '', 'traceId': '', 'spanId': '', 'commit': '', 'metadata': 'server-007'}))
 # print(get_es_data("logs"))
 # es=es_connection()
 # check_elasticsearch_connection(es)

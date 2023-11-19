@@ -18,19 +18,11 @@ def show_recent_logs():
     return jsonify({"es_data":es_data})
 
 # Implement log search endpoint
-@app.route('/search', methods=['GET'])
+@app.route('/search', methods=['POST'])
 def search_logs():
-    query_params = request.args.to_dict()
-    search_body = {
-        "query": {
-            "bool": {
-                "must": [{"match": {key: value}} for key, value in query_params.items()]
-            }
-        }
-    }
-    es=es_util.es_connection()
-    result = es.search(index="logs", body=search_body)
-    return jsonify(result['hits']['hits']), 200
+    query_params = request.get_json()
+    search_data=es_util.search_es_data("logs", query=query_params)
+    return jsonify({"search_data":search_data}), 200
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=3000, debug=True)  # Run Flask app on port 3000
