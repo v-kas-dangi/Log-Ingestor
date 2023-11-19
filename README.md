@@ -29,7 +29,7 @@ To run this project locally, follow these steps:
 
 ### Prerequisites
 
-Make sure you have Python and Elasticsearch installed on your system.
+Make sure you have Python installed and have a cloud instance of elastic.
 
 ### Installation
 
@@ -49,7 +49,7 @@ Make sure you have Python and Elasticsearch installed on your system.
    ```sh
    gradio gradio/interface.py
    ```
-  This should start the gradio app at the port 7860
+   This should start the gradio app at the port 7860
 6. Open your browser and go to http://localhost:7860 to access the Gradio interface.
 
 <!-- USAGE EXAMPLES -->
